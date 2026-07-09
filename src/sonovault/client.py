@@ -108,6 +108,45 @@ class SonoVault:
 
         raise last_error or SonoVaultError("Request failed", 0)
 
+    def _sse(self, path: str):
+        """Connect to an SSE endpoint. Yield one parsed JSON dict per event."""
+        import json as _json
+
+        url = self._base_url + path
+        headers = {"x-api-key": self._api_key, "Accept": "text/event-stream"}
+        # Connect timeout only. The read side must stay open indefinitely.
+        res = self._session.get(url, headers=headers, stream=True, timeout=(30, None))
+        if not res.ok:
+            try:
+                body = res.json()
+            except ValueError:
+                body = None
+            message = body.get("error") if isinstance(body, dict) else None
+            raise SonoVaultError(message or f"HTTP {res.status_code}", res.status_code, body)
+
+        def events():
+            data_lines = []
+            try:
+                for line in res.iter_lines(decode_unicode=True):
+                    if line is None:
+                        continue
+                    if line == "":
+                        # Blank line ends the frame.
+                        if data_lines:
+                            raw = "\n".join(data_lines)
+                            data_lines.clear()
+                            try:
+                                yield _json.loads(raw)
+                            except ValueError:
+                                pass  # skip non-JSON frames (keep-alives)
+                    elif line.startswith("data:"):
+                        data_lines.append(line[5:].lstrip(" "))
+                    # event:, id:, retry:, and comment lines are ignored.
+            finally:
+                res.close()
+
+        return events()
+
 
 class _Namespace:
     def __init__(self, client: SonoVault):
@@ -278,9 +317,16 @@ class _Streams(_Namespace):
             "from": from_, "until": until, "stream_id": stream_id,
         })
 
-    def live(self) -> Dict[str, Any]:
-        """What's playing right now across your monitored streams."""
-        return self._client._request("GET", "/v1/streams/live")
+    def live(self):
+        """Real-time play events for your monitored streams.
+
+        Yields one dict per Server-Sent Event. Blocks while waiting for
+        events; run it in a thread if you need concurrency::
+
+            for event in sv.streams.live():
+                print(event["data"].get("track", {}).get("title"))
+        """
+        return self._client._sse("/v1/streams/live")
 
     def stop(self, stream_id: str) -> None:
         """Stop monitoring a stream."""

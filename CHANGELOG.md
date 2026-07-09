@@ -5,6 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Fixed
+
+- `streams.live()` now consumes the endpoint as Server-Sent Events and returns a generator of parsed events. It previously tried to parse the infinite stream as JSON and hung.
+
 ## [1.0.0] - 2026-07-09
 
 ### Added

@@ -124,6 +124,42 @@ def test_delete_returns_none_on_204():
     assert sv.webhooks.delete("wh_1") is None
 
 
+def test_streams_live_parses_sse_frames():
+    sv, session = make_client()
+    res = MagicMock()
+    res.ok = True
+    res.iter_lines.return_value = [
+        'data: {"id": "e1", "type": "stream.play.started", "created": 1, "data": {"stream_id": "s1"}}',
+        "",
+        ": keep-alive comment",
+        "",
+        "event: stream.online",
+        'data: {"id": "e2", "type": "stream.online", "created": 2, "data": {"stream_id": "s1"}}',
+        "",
+    ]
+    session.get.return_value = res
+
+    events = list(sv.streams.live())
+
+    assert [e["id"] for e in events] == ["e1", "e2"]
+    assert events[1]["type"] == "stream.online"
+    res.close.assert_called_once()
+
+
+def test_streams_live_raises_on_error_response():
+    sv, session = make_client()
+    res = MagicMock()
+    res.ok = False
+    res.status_code = 401
+    res.json.return_value = {"error": "nope"}
+    session.get.return_value = res
+
+    with pytest.raises(SonoVaultError) as exc:
+        sv.streams.live()
+
+    assert exc.value.status == 401
+
+
 def test_custom_base_url():
     sv, session = make_client(make_response(body={"genres": []}))
     sv2 = SonoVault(api_key="svk_test", base_url="http://localhost:3000/", session=session)
