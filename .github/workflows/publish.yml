@@ -1,0 +1,38 @@
+name: Publish
+
+# Publishes to PyPI when a GitHub release is published.
+# Auth is a PyPI Trusted Publisher (OIDC): no token stored anywhere.
+# Configure once on pypi.org: project sonovault -> Manage -> Publishing
+# -> add GitHub publisher rekordcloud/sonovault-python, workflow publish.yml.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check the tag matches pyproject.toml
+        run: |
+          VERSION=$(python -c "import re; print(re.search(r'^version = \"([^\"]+)\"', open('pyproject.toml').read(), re.M).group(1))")
+          TAG="${{ github.event.release.tag_name }}"
+          if [ "v$VERSION" != "$TAG" ]; then
+            echo "Tag $TAG does not match pyproject.toml version $VERSION"
+            exit 1
+          fi
+      - run: pip install -e ".[dev]" && pytest -q
+      - run: pip install build && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
