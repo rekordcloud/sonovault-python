@@ -1,0 +1,133 @@
+import json
+from unittest.mock import MagicMock
+
+import pytest
+
+from sonovault import SonoVault, SonoVaultError
+
+TRACK = {
+    "id": 123,
+    "title": "One More Time",
+    "artists": [{"id": 1, "name": "Daft Punk"}],
+    "isrc": "GBDUW0000053",
+    "releases": [],
+    "duration": 320,
+    "genre": "House",
+    "subgenre": None,
+}
+
+
+def make_response(status=200, body=None, headers=None):
+    res = MagicMock()
+    res.ok = 200 <= status < 300
+    res.status_code = status
+    res.headers = headers or {}
+    res.content = b"" if body is None else json.dumps(body).encode()
+    if body is None:
+        res.json.side_effect = ValueError("no body")
+    else:
+        res.json.return_value = body
+    return res
+
+
+def make_client(*responses):
+    session = MagicMock()
+    session.request.side_effect = list(responses)
+    return SonoVault(api_key="svk_test", session=session), session
+
+
+def test_requires_api_key():
+    with pytest.raises(ValueError):
+        SonoVault(api_key="")
+
+
+def test_search_sends_key_and_params():
+    sv, session = make_client(make_response(body={"results": [TRACK], "next_cursor": None}))
+
+    page = sv.tracks.search(artist="Daft Punk", title="One More Time", limit=5)
+
+    assert page["results"][0]["isrc"] == "GBDUW0000053"
+    method, url = session.request.call_args[0]
+    kwargs = session.request.call_args[1]
+    assert method == "GET"
+    assert url == "https://api.sonovault.now/v1/tracks/search"
+    assert kwargs["params"] == {"artist": "Daft Punk", "title": "One More Time", "limit": 5}
+    assert kwargs["headers"]["x-api-key"] == "svk_test"
+
+
+def test_none_params_are_dropped():
+    sv, session = make_client(make_response(body={"results": [], "next_cursor": None}))
+
+    sv.tracks.search(artist="Daft Punk", title="Around the World")
+
+    assert "cursor" not in session.request.call_args[1]["params"]
+    assert "limit" not in session.request.call_args[1]["params"]
+
+
+def test_resolve_posts_json_body():
+    sv, session = make_client(make_response(body={"results": [], "partial": False}))
+
+    sv.tracks.resolve(input_type="isrc", items=["GBDUW0000053"])
+
+    method, url = session.request.call_args[0]
+    assert (method, url) == ("POST", "https://api.sonovault.now/v1/tracks/resolve")
+    assert session.request.call_args[1]["json"] == {
+        "input_type": "isrc",
+        "items": ["GBDUW0000053"],
+    }
+
+
+def test_error_carries_status_and_message():
+    sv, _ = make_client(make_response(status=403, body={"error": "Paid plan required"}))
+
+    with pytest.raises(SonoVaultError) as exc:
+        sv.tracks.browse(genre="House")
+
+    assert exc.value.status == 403
+    assert exc.value.is_forbidden
+    assert "Paid plan required" in str(exc.value)
+
+
+def test_retries_429_with_retry_after():
+    sv, session = make_client(
+        make_response(status=429, body={"error": "rate limited"}, headers={"Retry-After": "0"}),
+        make_response(body=TRACK),
+    )
+
+    track = sv.tracks.get(123)
+
+    assert track["title"] == "One More Time"
+    assert session.request.call_count == 2
+
+
+def test_does_not_retry_quota_429():
+    sv, session = make_client(make_response(status=429, body={"error": "Monthly quota exceeded"}))
+
+    with pytest.raises(SonoVaultError) as exc:
+        sv.tracks.get(123)
+
+    assert exc.value.is_rate_limited
+    assert session.request.call_count == 1
+
+
+def test_stream_report_maps_from_param():
+    sv, session = make_client(make_response(body={"plays": []}))
+
+    sv.streams.report(from_="2026-07-01", until="2026-07-08")
+
+    assert session.request.call_args[1]["params"] == {"from": "2026-07-01", "until": "2026-07-08"}
+
+
+def test_delete_returns_none_on_204():
+    sv, _ = make_client(make_response(status=204))
+
+    assert sv.webhooks.delete("wh_1") is None
+
+
+def test_custom_base_url():
+    sv, session = make_client(make_response(body={"genres": []}))
+    sv2 = SonoVault(api_key="svk_test", base_url="http://localhost:3000/", session=session)
+
+    sv2.genres.list()
+
+    assert session.request.call_args[0][1] == "http://localhost:3000/v1/genres"
