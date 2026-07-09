@@ -351,6 +351,9 @@ class _Webhooks(_Namespace):
     def list(self) -> Dict[str, Any]:
         return self._client._request("GET", "/v1/webhooks")
 
+    def get(self, webhook_id: str) -> Dict[str, Any]:
+        return self._client._request("GET", f"/v1/webhooks/{webhook_id}")
+
     def update(self, webhook_id: str, body: Dict[str, Any]) -> Dict[str, Any]:
         return self._client._request("PATCH", f"/v1/webhooks/{webhook_id}", json=body)
 

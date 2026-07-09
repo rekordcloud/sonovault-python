@@ -95,7 +95,7 @@ Rate-limited responses that carry a `Retry-After` header are retried automatical
 | `sv.genres` | `list` |
 | `sv.suggestions` | `submit`, `list` |
 | `sv.streams` | `create`, `list`, `get`, `update`, `history`, `report`, `live`, `stop` |
-| `sv.webhooks` | `create`, `list`, `update`, `delete`, `test`, `deliveries` |
+| `sv.webhooks` | `create`, `list`, `get`, `update`, `delete`, `test`, `deliveries` |
 
 Some endpoints (audio identify, browse, stream monitoring) need a paid tier. See [pricing](https://sonovault.now/pricing). Everything else works on the free tier.
 
