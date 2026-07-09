@@ -230,3 +230,22 @@ def test_paginate_walks_all_pages():
 
     assert [i["id"] for i in items] == [1, 2, 3]
     assert session.request.call_count == 2
+
+
+def test_context_manager_closes_owned_session(monkeypatch):
+    sv = SonoVault(api_key="svk_test")
+    closed = []
+    monkeypatch.setattr(sv._session, "close", lambda: closed.append(True))
+
+    with sv:
+        pass
+
+    assert closed == [True]
+
+
+def test_context_manager_leaves_injected_session_open():
+    session = MagicMock()
+    with SonoVault(api_key="svk_test", session=session):
+        pass
+
+    session.close.assert_not_called()

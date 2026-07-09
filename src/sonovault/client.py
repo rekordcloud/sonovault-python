@@ -52,6 +52,8 @@ class SonoVault:
         self._timeout = timeout
         self._session = session or requests.Session()
 
+        self._owns_session = session is None
+
         self.tracks = _Tracks(self)
         self.artists = _Artists(self)
         self.labels = _Labels(self)
@@ -60,6 +62,17 @@ class SonoVault:
         self.suggestions = _Suggestions(self)
         self.streams = _Streams(self)
         self.webhooks = _Webhooks(self)
+
+    def close(self) -> None:
+        """Close the underlying session (only if the client created it)."""
+        if self._owns_session:
+            self._session.close()
+
+    def __enter__(self) -> "SonoVault":
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.close()
 
     # -- plumbing ---------------------------------------------------------
 
