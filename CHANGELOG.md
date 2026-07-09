@@ -10,6 +10,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - `verify_webhook_signature()` helper for checking the `SonoVault-Signature` header on webhook deliveries (HMAC-SHA256, constant-time compare, replay-window check).
 - `timeout` client option in seconds (default 30, was hardcoded).
 - `webhooks.get(webhook_id)` for fetching a single webhook endpoint.
+- `User-Agent: sonovault-python/<version>` header on every request.
 
 ### Fixed
 

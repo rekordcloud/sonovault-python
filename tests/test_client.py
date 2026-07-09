@@ -209,3 +209,12 @@ def test_timeout_is_configurable():
     sv.genres.list()
 
     assert session.request.call_args[1]["timeout"] == 7.5
+
+
+def test_sends_user_agent_header():
+    sv, session = make_client(make_response(body={"genres": []}))
+
+    sv.genres.list()
+
+    ua = session.request.call_args[1]["headers"]["User-Agent"]
+    assert ua.startswith("sonovault-python/")

@@ -15,9 +15,11 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 
+from ._version import __version__
 from .errors import SonoVaultError
 
 DEFAULT_BASE_URL = "https://api.sonovault.now"
+USER_AGENT = f"sonovault-python/{__version__}"
 
 
 class SonoVault:
@@ -73,7 +75,7 @@ class SonoVault:
     ) -> Any:
         url = self._base_url + path
         clean_params = {k: v for k, v in (params or {}).items() if v is not None}
-        headers = {"x-api-key": self._api_key}
+        headers = {"x-api-key": self._api_key, "User-Agent": USER_AGENT}
         if content_type:
             headers["Content-Type"] = content_type
 
@@ -117,7 +119,11 @@ class SonoVault:
         import json as _json
 
         url = self._base_url + path
-        headers = {"x-api-key": self._api_key, "Accept": "text/event-stream"}
+        headers = {
+            "x-api-key": self._api_key,
+            "User-Agent": USER_AGENT,
+            "Accept": "text/event-stream",
+        }
         # Connect timeout only. The read side must stay open indefinitely.
         res = self._session.get(url, headers=headers, stream=True, timeout=(self._timeout, None))
         if not res.ok:
