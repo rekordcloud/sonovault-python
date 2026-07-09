@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Check the tag matches pyproject.toml
+        if: github.event_name == 'release'
         run: |
           VERSION=$(python -c "import re; print(re.search(r'^version = \"([^\"]+)\"', open('pyproject.toml').read(), re.M).group(1))")
           TAG="${{ github.event.release.tag_name }}"
