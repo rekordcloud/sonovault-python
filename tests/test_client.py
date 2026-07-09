@@ -1,9 +1,12 @@
+import hashlib
+import hmac
 import json
+import time
 from unittest.mock import MagicMock
 
 import pytest
 
-from sonovault import SonoVault, SonoVaultError
+from sonovault import SonoVault, SonoVaultError, verify_webhook_signature
 
 TRACK = {
     "id": 123,
@@ -158,6 +161,35 @@ def test_streams_live_raises_on_error_response():
         sv.streams.live()
 
     assert exc.value.status == 401
+
+
+def _sign(secret, timestamp, payload):
+    return hmac.new(
+        secret.encode(), f"{timestamp}.{payload}".encode(), hashlib.sha256
+    ).hexdigest()
+
+
+def test_verify_webhook_signature_valid_and_tampered():
+    secret = "whsec_test"
+    payload = '{"id": "evt_1", "type": "stream.play.started"}'
+    t = int(time.time())
+    header = f"t={t},v1={_sign(secret, t, payload)}"
+
+    assert verify_webhook_signature(secret, header, payload)
+    assert verify_webhook_signature(secret, header, payload.encode())
+    assert not verify_webhook_signature(secret, header, payload + "x")
+    assert not verify_webhook_signature("whsec_other", header, payload)
+    assert not verify_webhook_signature(secret, "garbage", payload)
+
+
+def test_verify_webhook_signature_stale_timestamp():
+    secret = "whsec_test"
+    payload = "{}"
+    t = int(time.time()) - 3600
+    header = f"t={t},v1={_sign(secret, t, payload)}"
+
+    assert not verify_webhook_signature(secret, header, payload)
+    assert verify_webhook_signature(secret, header, payload, tolerance_seconds=0)
 
 
 def test_custom_base_url():
