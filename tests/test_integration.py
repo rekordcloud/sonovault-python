@@ -33,9 +33,8 @@ def test_search_by_artist_title(sv):
 def test_isrc_and_id_lookup_agree(sv):
     page = sv.tracks.search(artist="Daft Punk", title="Around the World", limit=1)
     found = page["results"][0]
-    # search returns ids as strings, other endpoints as ints — compare normalized
-    assert int(sv.tracks.by_isrc(found["isrc"])["id"]) == int(found["id"])
-    assert sv.tracks.get(int(found["id"]))["title"] == found["title"]
+    assert sv.tracks.by_isrc(found["isrc"])["id"] == found["id"]
+    assert sv.tracks.get(found["id"])["title"] == found["title"]
 
 
 def test_cross_platform_links(sv):
@@ -57,7 +56,7 @@ def test_bulk_resolve(sv):
     found = page["results"][0]
     batch = sv.tracks.resolve(input_type="isrc", items=[found["isrc"]])
     assert batch["results"][0]["status"] == "matched"
-    assert int(batch["results"][0]["track"]["id"]) == int(found["id"])
+    assert batch["results"][0]["track"]["id"] == found["id"]
 
 
 def test_genres(sv):
