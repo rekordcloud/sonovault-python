@@ -5,6 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- `examples/` folder: find an ISRC, cross-platform links, play-log enrichment, live SSE events, and a webhook receiver with signature verification.
+
 ## [1.1.0] - 2026-07-09
 
 ### Added

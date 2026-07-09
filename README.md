@@ -84,6 +84,11 @@ except SonoVaultError as err:
 
 Rate-limited responses that carry a `Retry-After` header are retried automatically. The default is 2 retries, configurable with `max_retries`.
 
+
+## Examples
+
+Runnable scripts live in [`examples/`](examples/): find an ISRC, resolve cross-platform links, enrich a play log, follow live stream events over SSE, and verify webhook deliveries.
+
 ## API coverage
 
 | Namespace | Methods |
