@@ -199,3 +199,13 @@ def test_custom_base_url():
     sv2.genres.list()
 
     assert session.request.call_args[0][1] == "http://localhost:3000/v1/genres"
+
+
+def test_timeout_is_configurable():
+    session = MagicMock()
+    session.request.return_value = make_response(body={"genres": []})
+    sv = SonoVault(api_key="svk_test", timeout=7.5, session=session)
+
+    sv.genres.list()
+
+    assert session.request.call_args[1]["timeout"] == 7.5

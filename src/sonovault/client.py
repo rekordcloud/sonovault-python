@@ -24,10 +24,12 @@ class SonoVault:
     """Client for the SonoVault music metadata API (https://sonovault.now).
 
     Args:
-        api_key: your API key — get a free one at https://sonovault.now
+        api_key: your API key. Get a free one at https://sonovault.now
             (1,000 requests/month, no credit card).
         base_url: override the API base URL.
         max_retries: retries on retryable 429/5xx responses. Default 2.
+        timeout: per-request timeout in seconds. Default 30. Does not apply
+            to the read side of ``streams.live()``, which stays open.
         session: optional ``requests.Session`` (for pooling or testing).
     """
 
@@ -37,6 +39,7 @@ class SonoVault:
         *,
         base_url: str = DEFAULT_BASE_URL,
         max_retries: int = 2,
+        timeout: float = 30.0,
         session: Optional[requests.Session] = None,
     ):
         if not api_key:
@@ -44,6 +47,7 @@ class SonoVault:
         self._api_key = api_key
         self._base_url = base_url.rstrip("/")
         self._max_retries = max_retries
+        self._timeout = timeout
         self._session = session or requests.Session()
 
         self.tracks = _Tracks(self)
@@ -78,7 +82,7 @@ class SonoVault:
             try:
                 res = self._session.request(
                     method, url, params=clean_params, json=json, data=data,
-                    headers=headers, timeout=30,
+                    headers=headers, timeout=self._timeout,
                 )
             except requests.RequestException as exc:
                 last_error = SonoVaultError(f"Network error: {exc}", 0)
@@ -115,7 +119,7 @@ class SonoVault:
         url = self._base_url + path
         headers = {"x-api-key": self._api_key, "Accept": "text/event-stream"}
         # Connect timeout only. The read side must stay open indefinitely.
-        res = self._session.get(url, headers=headers, stream=True, timeout=(30, None))
+        res = self._session.get(url, headers=headers, stream=True, timeout=(self._timeout, None))
         if not res.ok:
             try:
                 body = res.json()
