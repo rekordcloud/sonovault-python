@@ -4,4 +4,4 @@ from .client import SonoVault
 from .errors import SonoVaultError
 
 __all__ = ["SonoVault", "SonoVaultError"]
-__version__ = "0.1.0"
+__version__ = "1.0.0"
