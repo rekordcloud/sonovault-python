@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from sonovault import SonoVault, SonoVaultError, verify_webhook_signature
+from sonovault import SonoVault, SonoVaultError, paginate, verify_webhook_signature
 
 TRACK = {
     "id": 123,
@@ -218,3 +218,15 @@ def test_sends_user_agent_header():
 
     ua = session.request.call_args[1]["headers"]["User-Agent"]
     assert ua.startswith("sonovault-python/")
+
+
+def test_paginate_walks_all_pages():
+    sv, session = make_client(
+        make_response(body={"results": [{"id": 1}, {"id": 2}], "next_cursor": "c1"}),
+        make_response(body={"results": [{"id": 3}], "next_cursor": None}),
+    )
+
+    items = list(paginate(lambda cursor: sv.suggestions.list(cursor=cursor)))
+
+    assert [i["id"] for i in items] == [1, 2, 3]
+    assert session.request.call_count == 2

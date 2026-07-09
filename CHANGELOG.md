@@ -8,6 +8,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 
 - `examples/` folder: find an ISRC, cross-platform links, play-log enrichment, live SSE events, and a webhook receiver with signature verification.
+- `paginate()` helper: iterate every item across all pages of any cursor-paginated endpoint.
 
 ## [1.1.0] - 2026-07-09
 

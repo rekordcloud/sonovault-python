@@ -60,6 +60,15 @@ for row in batch["results"]:
 List endpoints return `{"results": [...], "next_cursor": ...}`. Pass the cursor back for the next page. `next_cursor` is `None` on the last page.
 
 ```python
+from sonovault import paginate
+
+for release in paginate(lambda cursor: sv.artists.releases(42, cursor=cursor)):
+    print(release["title"])
+```
+
+Or walk the cursor yourself:
+
+```python
 cursor = None
 while True:
     page = sv.artists.releases(42, cursor=cursor)
