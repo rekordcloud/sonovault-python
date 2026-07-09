@@ -3,11 +3,11 @@
 [![CI](https://github.com/rekordcloud/sonovault-python/actions/workflows/ci.yml/badge.svg)](https://github.com/rekordcloud/sonovault-python/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/sonovault)](https://pypi.org/project/sonovault/)
 
-Python client for the **[SonoVault](https://sonovault.now)** music metadata API — 90M+ tracks with ISRC, ISWC, genre, record label, canonical release dates, and cross-platform IDs for Spotify, Apple Music, Tidal, Beatport, Discogs, and MusicBrainz, resolved in a single call.
+Python client for the **[SonoVault](https://sonovault.now)** music metadata API. 90M+ tracks with ISRC, ISWC, genre, record label, canonical release dates, and cross-platform IDs for Spotify, Apple Music, Tidal, Beatport, Discogs, and MusicBrainz. One call resolves them all.
 
-- **One key, no OAuth** — a single `x-api-key` header, no approval queue.
-- **Free tier** — 1,000 requests/month, no credit card: [get an API key](https://sonovault.now).
-- **Docs** — full API reference at [sonovault.now/docs](https://sonovault.now/docs).
+- **One key, no OAuth.** A single `x-api-key` header, no approval queue.
+- **Free tier.** 1,000 requests/month, no credit card: [get an API key](https://sonovault.now).
+- **Docs.** Full API reference at [sonovault.now/docs](https://sonovault.now/docs).
 
 ## Install
 
@@ -33,15 +33,15 @@ print(track["genre"], track["releases"][0]["label"]["name"])
 # Resolve that ISRC to its ID on every platform
 links = sv.tracks.links(isrc=track["isrc"])
 for link in links["links"]:
-    print(link["source"], link["url"])  # spotify https://open.spotify.com/track/…
+    print(link["source"], link["url"])  # spotify https://open.spotify.com/track/...
 
-# Recording → composition (ISWC), for royalty/publishing workflows
+# Recording to composition (ISWC), for royalty and publishing workflows
 work = sv.tracks.iswc(isrc=track["isrc"])
 ```
 
 ## Bulk resolve
 
-Resolve up to 100 lines — track names, ISRCs, or platform IDs — in one request (great for enriching play logs and library exports):
+Resolve up to 100 lines in one request: track names, ISRCs, or platform IDs. Useful for enriching play logs and library exports.
 
 ```python
 batch = sv.tracks.resolve(
@@ -57,13 +57,13 @@ for row in batch["results"]:
 
 ## Pagination
 
-List endpoints return `{"results": [...], "next_cursor": ...}` — pass the cursor back for the next page (`next_cursor` is `None` on the last page):
+List endpoints return `{"results": [...], "next_cursor": ...}`. Pass the cursor back for the next page. `next_cursor` is `None` on the last page.
 
 ```python
 cursor = None
 while True:
     page = sv.artists.releases(42, cursor=cursor)
-    # …use page["results"]
+    # ...use page["results"]
     cursor = page.get("next_cursor")
     if not cursor:
         break
@@ -82,7 +82,7 @@ except SonoVaultError as err:
     print(err.status, err.is_forbidden, err)
 ```
 
-Rate-limited responses that carry a `Retry-After` header are retried automatically (twice by default; configure with `max_retries`).
+Rate-limited responses that carry a `Retry-After` header are retried automatically. The default is 2 retries, configurable with `max_retries`.
 
 ## API coverage
 
@@ -97,13 +97,13 @@ Rate-limited responses that carry a `Retry-After` header are retried automatical
 | `sv.streams` | `create`, `list`, `get`, `update`, `history`, `report`, `live`, `stop` |
 | `sv.webhooks` | `create`, `list`, `update`, `delete`, `test`, `deliveries` |
 
-Some endpoints (audio identify, browse, charts, stream monitoring) need a paid tier — see [pricing](https://sonovault.now/pricing). Everything else works on the free tier.
+Some endpoints (audio identify, browse, stream monitoring) need a paid tier. See [pricing](https://sonovault.now/pricing). Everything else works on the free tier.
 
 ## Related
 
-- [SonoVault API docs](https://sonovault.now/docs) — full endpoint reference with examples in 8 languages
-- [sonovault-js](https://github.com/rekordcloud/sonovault-js) — the TypeScript/Node client
-- [Free ISRC lookup](https://sonovault.now/isrc-lookup) · [ISWC lookup](https://sonovault.now/iswc-lookup) — browser tools built on the same API
+- [SonoVault API docs](https://sonovault.now/docs). Full endpoint reference with examples in 8 languages.
+- [sonovault-js](https://github.com/rekordcloud/sonovault-js). The TypeScript/Node client.
+- [Free ISRC lookup](https://sonovault.now/isrc-lookup) and [ISWC lookup](https://sonovault.now/iswc-lookup). Browser tools built on the same API.
 
 ## License
 
