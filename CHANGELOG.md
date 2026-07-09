@@ -11,6 +11,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - `timeout` client option in seconds (default 30, was hardcoded).
 - `webhooks.get(webhook_id)` for fetching a single webhook endpoint.
 - `User-Agent: sonovault-python/<version>` header on every request.
+- `py.typed` marker so mypy and pyright pick up the package's type hints.
 
 ### Fixed
 
