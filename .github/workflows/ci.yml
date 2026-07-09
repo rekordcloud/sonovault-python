@@ -16,5 +16,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Check pyproject.toml and _version.py agree
+        run: |
+          PY=$(python -c "import re; print(re.search(r'__version__ = \"([^\"]+)\"', open('src/sonovault/_version.py').read()).group(1))")
+          TOML=$(python -c "import re; print(re.search(r'^version = \"([^\"]+)\"', open('pyproject.toml').read(), re.M).group(1))")
+          if [ "$PY" != "$TOML" ]; then
+            echo "Version drift: pyproject.toml=$TOML _version.py=$PY"
+            exit 1
+          fi
       - run: pip install -e ".[dev]"
       - run: pytest -q
