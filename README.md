@@ -3,7 +3,7 @@
 [![CI](https://github.com/rekordcloud/sonovault-python/actions/workflows/ci.yml/badge.svg)](https://github.com/rekordcloud/sonovault-python/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/sonovault)](https://pypi.org/project/sonovault/)
 
-Python client for the **[SonoVault](https://sonovault.now)** music metadata API. 90M+ tracks with ISRC, ISWC, genre, record label, canonical release dates, and cross-platform IDs for Spotify, Apple Music, Tidal, Beatport, Discogs, and MusicBrainz. One call resolves them all.
+Python client for the **[SonoVault](https://sonovault.now)** music metadata API. 93M+ tracks with ISRC, ISWC, genre, record label, canonical release dates, and cross-platform IDs for Spotify, Apple Music, Tidal, Beatport, Discogs, and MusicBrainz. One call resolves them all.
 
 - **One key, no OAuth.** A single `x-api-key` header, no approval queue.
 - **Free tier.** 1,000 requests/month, no credit card: [get an API key](https://sonovault.now).
