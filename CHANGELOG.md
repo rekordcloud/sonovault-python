@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-22
+
 ### Removed
 
 - **BREAKING:** `sv.tracks.identify()`. The API's client-side-Chromaprint request body (`POST /v1/tracks/identify` with a JSON `fingerprint` array) was removed on 2026-08-22 and now returns 415, so the method could only fail. Use `sv.tracks.identify_audio()` instead: send the raw audio bytes and the server fingerprints them. It is also the more accurate route, because cross-window voting, the tempo cross-check, and a second independent matcher all need the audio itself.
