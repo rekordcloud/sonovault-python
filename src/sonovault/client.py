@@ -216,17 +216,6 @@ class _Tracks(_Namespace):
         return self._client._request("POST", "/v1/tracks/resolve",
                                      json={"input_type": input_type, "items": items})
 
-    def identify(self, *, fingerprint: List[int],
-                 fingerprint_duration: Optional[float] = None,
-                 top_n: Optional[int] = None) -> Dict[str, Any]:
-        """Identify a track from a Chromaprint fingerprint (``fpcalc -raw``). Paid tiers."""
-        body: Dict[str, Any] = {"fingerprint": fingerprint}
-        if fingerprint_duration is not None:
-            body["fingerprint_duration"] = fingerprint_duration
-        if top_n is not None:
-            body["top_n"] = top_n
-        return self._client._request("POST", "/v1/tracks/identify", json=body)
-
     def identify_audio(self, audio: bytes, *, length: Optional[int] = None,
                        top_n: Optional[int] = None) -> Dict[str, Any]:
         """Identify a track from raw audio bytes (any ffmpeg-decodable format).

@@ -102,7 +102,7 @@ Runnable scripts live in [`examples/`](examples/): find an ISRC, resolve cross-p
 
 | Namespace | Methods |
 |---|---|
-| `sv.tracks` | `search`, `get`, `by_isrc`, `iswc`, `by_iswc`, `links`, `resolve`, `identify`, `identify_audio`, `browse` |
+| `sv.tracks` | `search`, `get`, `by_isrc`, `iswc`, `by_iswc`, `links`, `resolve`, `identify_audio`, `browse` |
 | `sv.artists` | `search`, `get`, `releases` |
 | `sv.labels` | `search`, `get`, `releases`, `artists` |
 | `sv.releases` | `search`, `get`, `latest` |
