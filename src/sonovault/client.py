@@ -242,6 +242,13 @@ class _Artists(_Namespace):
                                      params={"name": name, "limit": limit, "cursor": cursor})
 
     def get(self, artist_id: int) -> Dict[str, Any]:
+        """One artist's public profile (``GET /v1/artists/:id``).
+
+        Carries ``country``, ``formation_year``, ``formation_date``,
+        ``social_links``, ``wikidata_id`` and ``musicbrainz_id`` (the
+        MusicBrainz artist MBID), alongside a ``release_count`` summary. Any of
+        the identifiers is ``None`` when we hold no mapping.
+        """
         return self._client._request("GET", f"/v1/artists/{artist_id}")
 
     def releases(self, artist_id: int, *, limit: Optional[int] = None,
@@ -278,6 +285,14 @@ class _Releases(_Namespace):
         })
 
     def get(self, release_id: int) -> Dict[str, Any]:
+        """One release and its tracklist (``GET /v1/releases/:id``).
+
+        ``tracks`` comes back in playing order: ``disc_number``, then
+        ``track_number``, with any track whose position is unknown last and
+        both fields ``None``. A position belongs to the pairing of track and
+        release rather than to the track alone, so the same recording can be
+        track 6 on an album and track 2 on a compilation.
+        """
         return self._client._request("GET", f"/v1/releases/{release_id}")
 
     def latest(self, *, limit: Optional[int] = None,

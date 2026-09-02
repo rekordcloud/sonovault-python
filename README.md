@@ -30,6 +30,11 @@ track = page["results"][0]
 print(track["isrc"])   # "GBDUW0000053"
 print(track["genre"], track["releases"][0]["label"]["name"])
 
+# An album's tracklist, in playing order
+release = sv.releases.get(7)
+for t in release["tracks"]:
+    print(t["disc_number"], t["track_number"], t["title"])  # 1 1 One More Time
+
 # Resolve that ISRC to its ID on every platform
 links = sv.tracks.links(isrc=track["isrc"])
 for link in links["links"]:

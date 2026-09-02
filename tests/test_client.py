@@ -249,3 +249,66 @@ def test_context_manager_leaves_injected_session_open():
         pass
 
     session.close.assert_not_called()
+
+
+# --- release tracklists and the artist MusicBrainz id -----------------------
+
+RELEASE_WITH_POSITIONS = {
+    "id": 7,
+    "title": "Discovery",
+    "artist": {"id": 1, "name": "Daft Punk"},
+    "tracks": [
+        {"id": 1, "title": "One More Time", "artists": [], "isrc": None,
+         "duration": 320, "genre": [], "subgenre": [],
+         "disc_number": 1, "track_number": 1},
+        {"id": 2, "title": "Aerodynamic", "artists": [], "isrc": None,
+         "duration": 212, "genre": [], "subgenre": [],
+         "disc_number": 1, "track_number": 2},
+        {"id": 3, "title": "Unknown Slot", "artists": [], "isrc": None,
+         "duration": None, "genre": [], "subgenre": [],
+         "disc_number": None, "track_number": None},
+    ],
+}
+
+
+def test_release_tracklist_carries_positions_in_order():
+    sv, _ = make_client(make_response(body=RELEASE_WITH_POSITIONS))
+
+    release = sv.releases.get(7)
+
+    assert [t["track_number"] for t in release["tracks"]] == [1, 2, None]
+    assert release["tracks"][0]["disc_number"] == 1
+
+
+def test_release_track_without_a_position_stays_none():
+    # None, not 0: an unknown position must not read as "track zero".
+    sv, _ = make_client(make_response(body=RELEASE_WITH_POSITIONS))
+
+    release = sv.releases.get(7)
+
+    assert release["tracks"][2]["track_number"] is None
+    assert release["tracks"][2]["disc_number"] is None
+
+
+def test_artist_carries_musicbrainz_id():
+    sv, _ = make_client(make_response(body={
+        "id": 1, "name": "Daft Punk", "country": "France",
+        "wikidata_id": "Q185828",
+        "musicbrainz_id": "056e4f3e-d505-4dad-8ec1-d04f521cbb56",
+        "release_count": 42,
+    }))
+
+    artist = sv.artists.get(1)
+
+    assert artist["musicbrainz_id"] == "056e4f3e-d505-4dad-8ec1-d04f521cbb56"
+    assert artist["wikidata_id"] == "Q185828"
+
+
+def test_artist_without_a_musicbrainz_mapping_is_none():
+    sv, _ = make_client(make_response(body={
+        "id": 2, "name": "Unmapped", "musicbrainz_id": None, "release_count": 0,
+    }))
+
+    artist = sv.artists.get(2)
+
+    assert artist["musicbrainz_id"] is None
