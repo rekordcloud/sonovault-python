@@ -287,6 +287,11 @@ class _Releases(_Namespace):
     def get(self, release_id: int) -> Dict[str, Any]:
         """One release and its tracklist (``GET /v1/releases/:id``).
 
+        ``musicbrainz_release_ids`` and ``musicbrainz_release_group_ids`` are
+        lists, because a SonoVault release groups every edition of an album and
+        each edition carries its own MBID, so you pick the edition you need.
+        Empty when unmapped.
+
         ``tracks`` comes back in playing order: ``disc_number``, then
         ``track_number``, with any track whose position is unknown last and
         both fields ``None``. A position belongs to the pairing of track and

@@ -5,10 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-04
+
 ### Added
 
 - `releases.get()` returns its `tracks` in playing order, each carrying `disc_number` and `track_number`. A track whose position is unknown sorts last with both fields `None`. A position belongs to the pairing of track and release rather than to the track alone, so the same recording can be track 6 on an album and track 2 on a compilation.
 - `artists.get()`, `artists.search()` and `labels.artists()` return `musicbrainz_id`, the MusicBrainz artist MBID, alongside the existing `wikidata_id`. `None` when we hold no mapping.
+- `releases.get()` returns `musicbrainz_release_ids` and `musicbrainz_release_group_ids`. Lists, because a SonoVault release groups every edition of an album and each edition carries its own MBID, so you pick the edition you need. Empty when unmapped.
 
 ## [2.0.0] - 2026-08-22
 

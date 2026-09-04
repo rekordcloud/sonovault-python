@@ -312,3 +312,29 @@ def test_artist_without_a_musicbrainz_mapping_is_none():
     artist = sv.artists.get(2)
 
     assert artist["musicbrainz_id"] is None
+
+
+def test_release_carries_musicbrainz_id_lists():
+    sv, _ = make_client(make_response(body={
+        "id": 7, "title": "Discovery",
+        "musicbrainz_release_ids": ["bd3bb36e-16c8-438f-850e-dfbf4d1478f0"],
+        "musicbrainz_release_group_ids": ["48117b90-a16e-34ca-a514-19c702df1158"],
+        "tracks": [],
+    }))
+
+    release = sv.releases.get(7)
+
+    assert release["musicbrainz_release_ids"] == ["bd3bb36e-16c8-438f-850e-dfbf4d1478f0"]
+    assert release["musicbrainz_release_group_ids"] == ["48117b90-a16e-34ca-a514-19c702df1158"]
+
+
+def test_unmapped_release_returns_empty_lists_not_none():
+    sv, _ = make_client(make_response(body={
+        "id": 8, "title": "Unmapped",
+        "musicbrainz_release_ids": [], "musicbrainz_release_group_ids": [], "tracks": [],
+    }))
+
+    release = sv.releases.get(8)
+
+    assert release["musicbrainz_release_ids"] == []
+    assert release["musicbrainz_release_group_ids"] == []
