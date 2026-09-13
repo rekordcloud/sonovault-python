@@ -284,8 +284,9 @@ class _Releases(_Namespace):
             "title": title, "artist": artist, "limit": limit, "cursor": cursor,
         })
 
-    def get(self, release_id: int) -> Dict[str, Any]:
-        """One release and its tracklist (``GET /v1/releases/:id``).
+    def get(self, release_id: int, *, edition: Optional[int] = None) -> Dict[str, Any]:
+        """One release, its tracklist and the editions behind it
+        (``GET /v1/releases/:id``).
 
         ``musicbrainz_release_ids`` and ``musicbrainz_release_group_ids`` are
         lists, because a SonoVault release groups every edition of an album and
@@ -297,8 +298,17 @@ class _Releases(_Namespace):
         both fields ``None``. A position belongs to the pairing of track and
         release rather than to the track alone, so the same recording can be
         track 6 on an album and track 2 on a compilation.
+
+        ``editions`` lists the real editions behind the record, at most 20,
+        chosen so each is a genuinely different edition rather than twenty
+        pressings of the same one. Pass one of their ``id`` values as
+        ``edition`` to render that edition's numbering instead of the default
+        consensus; tracks the edition does not carry keep a ``None`` position
+        and come last. ``edition`` on the response echoes what you asked for,
+        or ``None``.
         """
-        return self._client._request("GET", f"/v1/releases/{release_id}")
+        return self._client._request("GET", f"/v1/releases/{release_id}",
+                                     params={"edition": edition})
 
     def latest(self, *, limit: Optional[int] = None,
                cursor: Optional[str] = None) -> Dict[str, Any]:

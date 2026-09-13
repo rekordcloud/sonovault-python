@@ -35,6 +35,11 @@ release = sv.releases.get(7)
 for t in release["tracks"]:
     print(t["disc_number"], t["track_number"], t["title"])  # 1 1 One More Time
 
+# One record groups every edition of an album, so pick the one you mean
+for e in release["editions"]:
+    print(e["id"], e["format"], e["release_date"], e["track_count"])  # 16216 cd 2001-03-12 14
+deluxe = sv.releases.get(7, edition=16216)
+
 # Resolve that ISRC to its ID on every platform
 links = sv.tracks.links(isrc=track["isrc"])
 for link in links["links"]:
