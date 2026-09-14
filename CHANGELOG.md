@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-09-14
+
+### Added
+
+- `releases.get(release_id, edition=...)` renders one edition's track numbering instead of the default consensus. Tracks that edition does not carry keep a `None` position and come last, and `edition` on the response echoes what you asked for.
+- `GET /v1/releases/:id` now returns `editions`: the real editions behind a release. A SonoVault release groups every edition of an album onto one record, so the single, the album, the deluxe edition and the box set share one ID; each entry carries its provider, format, release date, barcode, country and track count. At most 20, ordered so each is a genuinely different edition rather than twenty pressings of the same one.
+
 ## [2.1.0] - 2026-09-04
 
 ### Added
