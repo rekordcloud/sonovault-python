@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-09-19
+
 ### Added
 
 - Each entry in `releases.get()`'s `editions` now carries `label` and `catalog_no`: the label that issued that pressing and its catalog number. Pressings of one album often differ (the UK original and a US reissue each carry their own), which the single release-level `label` cannot show.
