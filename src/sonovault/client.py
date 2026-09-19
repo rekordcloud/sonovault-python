@@ -319,7 +319,9 @@ class _Releases(_Namespace):
 
         ``editions`` lists the real editions behind the record, at most 20,
         chosen so each is a genuinely different edition rather than twenty
-        pressings of the same one. Pass one of their ``id`` values as
+        pressings of the same one. Each names the ``label`` that issued that
+        pressing and its ``catalog_no``, which often differ between pressings
+        of one album. Pass one of their ``id`` values as
         ``edition`` to render that edition's numbering instead of the default
         consensus; tracks the edition does not carry keep a ``None`` position
         and come last. ``edition`` on the response echoes what you asked for,
