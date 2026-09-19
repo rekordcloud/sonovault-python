@@ -5,6 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- `from_` and `until` on `artists.releases()` and `labels.releases()`: inclusive `YYYY-MM-DD` release-date bounds (`from_` maps to the `from` param), so `labels.releases(label_id, from_="2026-09-11", until="2026-09-11")` lists what a label released that day. Undated releases are left out when either is set.
+
 ## [2.2.0] - 2026-09-14
 
 ### Added

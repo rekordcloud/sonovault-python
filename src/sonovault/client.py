@@ -252,9 +252,17 @@ class _Artists(_Namespace):
         return self._client._request("GET", f"/v1/artists/{artist_id}")
 
     def releases(self, artist_id: int, *, limit: Optional[int] = None,
-                 cursor: Optional[str] = None) -> Dict[str, Any]:
+                 cursor: Optional[str] = None, from_: Optional[str] = None,
+                 until: Optional[str] = None) -> Dict[str, Any]:
+        """An artist's releases, newest first (``GET /v1/artists/:id/releases``).
+
+        ``from_`` and ``until`` are inclusive ``YYYY-MM-DD`` release dates
+        (``from_`` maps to the ``from`` param). Undated releases are left out
+        when either is set.
+        """
         return self._client._request("GET", f"/v1/artists/{artist_id}/releases",
-                                     params={"limit": limit, "cursor": cursor})
+                                     params={"limit": limit, "cursor": cursor,
+                                             "from": from_, "until": until})
 
 
 class _Labels(_Namespace):
@@ -267,9 +275,19 @@ class _Labels(_Namespace):
         return self._client._request("GET", f"/v1/labels/{label_id}")
 
     def releases(self, label_id: int, *, limit: Optional[int] = None,
-                 cursor: Optional[str] = None) -> Dict[str, Any]:
+                 cursor: Optional[str] = None, from_: Optional[str] = None,
+                 until: Optional[str] = None) -> Dict[str, Any]:
+        """A label's releases, newest first (``GET /v1/labels/:id/releases``).
+
+        ``from_`` and ``until`` are inclusive ``YYYY-MM-DD`` release dates
+        (``from_`` maps to the ``from`` param), so
+        ``releases(label_id, from_="2026-09-11", until="2026-09-11")`` lists
+        what the label released that day. Undated releases are left out when
+        either is set.
+        """
         return self._client._request("GET", f"/v1/labels/{label_id}/releases",
-                                     params={"limit": limit, "cursor": cursor})
+                                     params={"limit": limit, "cursor": cursor,
+                                             "from": from_, "until": until})
 
     def artists(self, label_id: int, *, limit: Optional[int] = None,
                 cursor: Optional[str] = None) -> Dict[str, Any]:

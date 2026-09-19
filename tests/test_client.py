@@ -121,6 +121,21 @@ def test_stream_report_maps_from_param():
     assert session.request.call_args[1]["params"] == {"from": "2026-07-01", "until": "2026-07-08"}
 
 
+def test_label_and_artist_releases_map_the_date_range():
+    sv, session = make_client(
+        make_response(body={"results": [], "next_cursor": None}),
+        make_response(body={"results": [], "next_cursor": None}),
+    )
+
+    sv.labels.releases(11933, from_="2026-09-11", until="2026-09-11")
+    label_call = session.request.call_args_list[0]
+    assert label_call[0][1].endswith("/v1/labels/11933/releases")
+    assert label_call[1]["params"] == {"from": "2026-09-11", "until": "2026-09-11"}
+
+    sv.artists.releases(42, from_="2001-01-01")
+    assert session.request.call_args_list[1][1]["params"] == {"from": "2001-01-01"}
+
+
 def test_delete_returns_none_on_204():
     sv, _ = make_client(make_response(status=204))
 

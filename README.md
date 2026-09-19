@@ -47,6 +47,9 @@ for link in links["links"]:
 
 # Recording to composition (ISWC), for royalty and publishing workflows
 work = sv.tracks.iswc(isrc=track["isrc"])
+
+# What a label released on one day (from_ / until are inclusive YYYY-MM-DD)
+friday = sv.labels.releases(1, from_="2026-09-11", until="2026-09-11")
 ```
 
 ## Bulk resolve
