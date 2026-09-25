@@ -206,13 +206,19 @@ class _Tracks(_Namespace):
 
         Keyword args: ``id``, ``isrc``, ``spotify_id``, ``beatport_id``,
         ``discogs_id``, ``musicbrainz_id``, ``applemusic_id``, ``tidal_id``,
-        ``youtube_id``.
+        ``youtube_id``. ``discogs_id`` is a Discogs track key (release ID
+        plus track position, e.g. ``"2844-A"``); a bare release ID matches
+        nothing.
         """
         return self._client._request("GET", "/v1/tracks/links", params=dict(ids))
 
     def resolve(self, *, input_type: str,
                 items: List[Union[str, Dict[str, str]]]) -> Dict[str, Any]:
-        """Resolve up to 100 track names, ISRCs, or platform IDs in one request."""
+        """Resolve up to 100 track names, ISRCs, or platform IDs in one request.
+
+        For ``input_type="discogs_id"`` each item is a Discogs track key
+        (release ID plus track position, e.g. ``"2844-A"``), not a bare release ID.
+        """
         return self._client._request("POST", "/v1/tracks/resolve",
                                      json={"input_type": input_type, "items": items})
 
