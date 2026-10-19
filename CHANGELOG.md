@@ -9,7 +9,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ### Added
 
-- Documented BPM and musical key, now returned on every track (search, lookups, browse, resolve, stream events) and on each entry in `releases.get()`'s `tracks`: `bpm` (full tempo, up to 2 decimals), `key_alphanumeric` (e.g. `"10B"`), `key_musical` (e.g. `"D"`, `"F#m"`), `key_open` (Open Key, e.g. `"3d"`), and `keys`, every key held for the track as `{"key_alphanumeric", "key_musical", "key_open", "source"}`, one per source (`source` is currently `"openkeyscan"`). Each is `None`, and `keys` is `[]`, when the track has not been analysed. Key comes from OpenKeyScan and BPM from the Lexicon beat detector, both run by SonoVault on the audio. Responses are plain dicts, so no code change is needed to read them.
+- Documented BPM and musical key, now returned on every track (search, lookups, browse, resolve, stream events) and on each entry in `releases.get()`'s `tracks`: `bpm` (full tempo, up to 2 decimals), `key_alphanumeric` (e.g. `"10B"`), `key_musical` (e.g. `"D"`, `"F#m"`), `key_open` (Open Key, e.g. `"3d"`), and `keys`, every key held for the track as `{"key_alphanumeric", "key_musical", "key_open", "source"}`, one per source (`source` is currently `"openkeyscan"`). Each is `None`, and `keys` is `[]`, when the track has not been analysed. Key comes from OpenKeyScan and BPM from the Lexicon DJ beat detector, both run by SonoVault on the audio. Responses are plain dicts, so no code change is needed to read them.
 
 ### Changed
 

@@ -55,7 +55,7 @@ friday = sv.labels.releases(1, from_="2026-09-11", until="2026-09-11")
 
 ## Key and BPM
 
-Every track (search, lookups, browse, resolve, release tracklists, stream events) carries its tempo and musical key. Key comes from OpenKeyScan and BPM from the Lexicon beat detector (trusted by 100k+ DJs), both run by SonoVault on the audio.
+Every track (search, lookups, browse, resolve, release tracklists, stream events) carries its tempo and musical key. Key comes from OpenKeyScan and BPM from the Lexicon DJ beat detector (trusted by 100k+ DJs), both run by SonoVault on the audio.
 
 ```python
 track = sv.tracks.by_isrc("GBDUW0000053")  # Daft Punk, One More Time
