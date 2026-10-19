@@ -1,3 +1,3 @@
 """Package version. Keep in sync with pyproject.toml on release."""
 
-__version__ = "2.3.1"
+__version__ = "2.4.0"

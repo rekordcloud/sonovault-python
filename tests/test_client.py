@@ -15,9 +15,18 @@ TRACK = {
     "isrc": "GBDUW0000053",
     "releases": [],
     "duration": 320,
-    "genre": "House",
-    "subgenre": None,
+    "bpm": 123,
+    "key_alphanumeric": "10B",
+    "key_musical": "D",
+    "key_open": "3d",
+    "keys": [
+        {"key_alphanumeric": "10B", "key_musical": "D", "key_open": "3d", "source": "openkeyscan"},
+    ],
+    "genre": ["House"],
+    "subgenre": [],
 }
+
+UNANALYSED = {"bpm": None, "key_alphanumeric": None, "key_musical": None, "key_open": None, "keys": []}
 
 
 def make_response(status=200, body=None, headers=None):
@@ -274,13 +283,17 @@ RELEASE_WITH_POSITIONS = {
     "artist": {"id": 1, "name": "Daft Punk"},
     "tracks": [
         {"id": 1, "title": "One More Time", "artists": [], "isrc": None,
-         "duration": 320, "genre": [], "subgenre": [],
+         "duration": 320, "bpm": 123, "key_alphanumeric": "10B",
+         "key_musical": "D", "key_open": "3d",
+         "keys": [{"key_alphanumeric": "10B", "key_musical": "D",
+                   "key_open": "3d", "source": "openkeyscan"}],
+         "genre": [], "subgenre": [],
          "disc_number": 1, "track_number": 1},
         {"id": 2, "title": "Aerodynamic", "artists": [], "isrc": None,
-         "duration": 212, "genre": [], "subgenre": [],
+         "duration": 212, **UNANALYSED, "genre": [], "subgenre": [],
          "disc_number": 1, "track_number": 2},
         {"id": 3, "title": "Unknown Slot", "artists": [], "isrc": None,
-         "duration": None, "genre": [], "subgenre": [],
+         "duration": None, **UNANALYSED, "genre": [], "subgenre": [],
          "disc_number": None, "track_number": None},
     ],
 }
@@ -353,3 +366,39 @@ def test_unmapped_release_returns_empty_lists_not_none():
 
     assert release["musicbrainz_release_ids"] == []
     assert release["musicbrainz_release_group_ids"] == []
+
+
+# --- BPM and musical key -----------------------------------------------------
+
+def test_track_carries_bpm_and_key():
+    sv, _ = make_client(make_response(body=TRACK))
+
+    track = sv.tracks.get(123)
+
+    assert track["bpm"] == 123
+    assert track["key_alphanumeric"] == "10B"
+    assert track["key_musical"] == "D"
+    assert track["key_open"] == "3d"
+    assert track["keys"] == [
+        {"key_alphanumeric": "10B", "key_musical": "D", "key_open": "3d", "source": "openkeyscan"},
+    ]
+
+
+def test_unanalysed_track_has_none_and_empty_keys():
+    sv, _ = make_client(make_response(body={"results": [{**TRACK, **UNANALYSED}], "next_cursor": None}))
+
+    track = sv.tracks.search(artist="Daft Punk", title="One More Time")["results"][0]
+
+    assert track["bpm"] is None
+    assert track["key_alphanumeric"] is None
+    assert track["keys"] == []
+
+
+def test_release_tracklist_carries_bpm_and_key():
+    sv, _ = make_client(make_response(body=RELEASE_WITH_POSITIONS))
+
+    release = sv.releases.get(7)
+
+    assert release["tracks"][0]["bpm"] == 123
+    assert release["tracks"][0]["keys"][0]["source"] == "openkeyscan"
+    assert release["tracks"][1]["bpm"] is None
