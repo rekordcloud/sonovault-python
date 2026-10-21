@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sonovault"
-version = "2.4.0"
+version = "2.5.0"
 description = "Python client for the SonoVault music metadata API: ISRC, ISWC, genre, BPM, key, labels, release dates, and cross-platform IDs for 93M+ tracks."
 readme = "README.md"
 license = { text = "MIT" }

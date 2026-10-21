@@ -142,6 +142,8 @@ Runnable scripts live in [`examples/`](examples/): find an ISRC, resolve cross-p
 | `sv.genres` | `list` |
 | `sv.suggestions` | `submit`, `list` |
 | `sv.streams` | `create`, `list`, `get`, `update`, `history`, `report`, `live`, `stop` |
+
+If a station moves to a new stream URL, `sv.streams.update(stream_id, {"url": new_url})` repoints the stream in place, keeping its id and history.
 | `sv.webhooks` | `create`, `list`, `get`, `update`, `delete`, `test`, `deliveries` |
 
 Some endpoints (audio identify, browse, stream monitoring) need a paid tier. See [pricing](https://sonovault.now/pricing). Everything else works on the free tier.

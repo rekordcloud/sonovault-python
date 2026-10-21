@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-10-21
+
+### Added
+
+- `streams.update()` can change a stream's URL in place: pass `{"url": ...}` when a station moves or its old stream URL stops working. The stream keeps its id, its recognition history and its billing, so there is no need to delete and re-create it. If the stream was down, monitoring retries on the new URL straight away. The response includes `url`, the URL as stored (it may be normalised, so keep this value rather than the one you sent). Documented on `streams.update()`.
+
 ## [2.4.0] - 2026-10-19
 
 ### Added

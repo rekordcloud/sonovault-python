@@ -372,6 +372,9 @@ class _Streams(_Namespace):
         return self._client._request("GET", f"/v1/streams/{stream_id}")
 
     def update(self, stream_id: str, body: Dict[str, Any]) -> Dict[str, Any]:
+        """Change a stream's ``url``, ``format``, ``detection_mode`` and/or
+        ``outage_notifications``. A new ``url`` keeps the stream's id, history
+        and billing. The response echoes only the fields you sent. Paid tiers."""
         return self._client._request("PATCH", f"/v1/streams/{stream_id}", json=body)
 
     def history(self, stream_id: str, *, since: Optional[str] = None) -> Dict[str, Any]:
