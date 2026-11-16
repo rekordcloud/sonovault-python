@@ -332,13 +332,24 @@ class _Releases(_Namespace):
         consensus; tracks the edition does not carry keep a ``None`` position
         and come last. ``edition`` on the response echoes what you asked for,
         or ``None``.
+
+        ``digital_upc`` is the UPC the release was delivered to digital stores
+        with, picked from its digital editions (Beatport, then Apple Music,
+        then Spotify, then MusicBrainz and Discogs digital editions whose title
+        matches the release): 12 digits (UPC-A) when it fits, otherwise the
+        13-digit EAN, ``None`` when no digital edition carries one. Every
+        barcode stays available per edition in ``editions``.
         """
         return self._client._request("GET", f"/v1/releases/{release_id}",
                                      params={"edition": edition})
 
     def latest(self, *, limit: Optional[int] = None,
                cursor: Optional[str] = None) -> Dict[str, Any]:
-        """Newly released albums (``GET /v1/releases/new``). Paid tiers."""
+        """Newly released albums (``GET /v1/releases/new``). Paid tiers.
+
+        Each result carries ``digital_upc``, the UPC the release was delivered
+        to digital stores with, or ``None`` when no digital edition carries one.
+        """
         return self._client._request("GET", "/v1/releases/new",
                                      params={"limit": limit, "cursor": cursor})
 
