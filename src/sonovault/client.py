@@ -11,6 +11,7 @@ Usage:
 from __future__ import annotations
 
 import time
+from urllib.parse import quote
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -304,9 +305,29 @@ class _Labels(_Namespace):
 class _Releases(_Namespace):
     def search(self, *, title: str, artist: Optional[str] = None,
                limit: Optional[int] = None, cursor: Optional[str] = None) -> Dict[str, Any]:
+        """Search releases by title and optionally artist (``GET /v1/releases/search``).
+
+        Each result carries ``digital_upc``, the UPC the release was delivered
+        to digital stores with (``None`` when no digital edition carries one),
+        so an artist and an album title are enough to get a barcode.
+        """
         return self._client._request("GET", "/v1/releases/search", params={
             "title": title, "artist": artist, "limit": limit, "cursor": cursor,
         })
+
+    def by_upc(self, upc: str) -> Dict[str, Any]:
+        """The release behind a UPC, EAN or GTIN barcode (``GET /v1/releases/upc/:upc``).
+
+        Accepts 8 to 14 digits (spaces and hyphens are ignored), and a 12-digit
+        UPC-A finds the same release as its 13-digit EAN form with a leading
+        zero. Returns ``{"upc": ..., "results": [...]}`` with the matching
+        releases oldest first (usually one); each has ``id``, ``title``,
+        ``artist``, ``label``, ``release_date``, ``digital_upc`` and
+        ``formats``. Only barcodes with title evidence on the release are
+        matched. Raises ``SonoVaultError`` with status 404 when no release
+        carries the barcode. Free tier.
+        """
+        return self._client._request("GET", f"/v1/releases/upc/{quote(str(upc), safe='')}")
 
     def get(self, release_id: int, *, edition: Optional[int] = None) -> Dict[str, Any]:
         """One release, its tracklist and the editions behind it

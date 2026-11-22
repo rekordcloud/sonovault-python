@@ -41,6 +41,12 @@ for e in release["editions"]:
     print(e["id"], e["format"], e["release_date"], e["track_count"])  # 16216 cd 2001-03-12 14
 deluxe = sv.releases.get(7, edition=16216)
 
+# Find an album's UPC from its name, or the release behind a barcode
+found = sv.releases.search(title="Discovery", artist="Daft Punk")["results"][0]
+print(found["digital_upc"])  # 724384960650
+by_barcode = sv.releases.by_upc("724384960650")  # UPC-A or EAN-13, 404 if unknown
+print(by_barcode["results"][0]["title"])  # Discovery
+
 # Resolve that ISRC to its ID on every platform
 links = sv.tracks.links(isrc=track["isrc"])
 for link in links["links"]:
@@ -138,7 +144,7 @@ Runnable scripts live in [`examples/`](examples/): find an ISRC, resolve cross-p
 | `sv.tracks` | `search`, `get`, `by_isrc`, `iswc`, `by_iswc`, `links`, `resolve`, `identify_audio`, `browse` |
 | `sv.artists` | `search`, `get`, `releases` |
 | `sv.labels` | `search`, `get`, `releases`, `artists` |
-| `sv.releases` | `search`, `get`, `latest` |
+| `sv.releases` | `search`, `get`, `by_upc`, `latest` |
 | `sv.genres` | `list` |
 | `sv.suggestions` | `submit`, `list` |
 | `sv.streams` | `create`, `list`, `get`, `update`, `history`, `report`, `live`, `stop` |

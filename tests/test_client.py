@@ -342,6 +342,33 @@ def test_artist_without_a_musicbrainz_mapping_is_none():
     assert artist["musicbrainz_id"] is None
 
 
+def test_release_by_upc_puts_the_barcode_in_the_path():
+    sv, session = make_client(make_response(body={
+        "upc": "724384960650",
+        "results": [{
+            "id": 1384, "title": "Discovery", "artist": {"id": 1, "name": "Daft Punk"},
+            "label": {"id": 10, "name": "Virgin Records"}, "release_date": "2001-03-12",
+            "digital_upc": "724384960650", "formats": ["digital"],
+        }],
+    }))
+
+    res = sv.releases.by_upc("724384960650")
+
+    assert session.request.call_args[0][1].endswith("/v1/releases/upc/724384960650")
+    assert res["upc"] == "724384960650"
+    assert res["results"][0]["title"] == "Discovery"
+    assert res["results"][0]["formats"] == ["digital"]
+
+
+def test_release_by_upc_raises_404_for_an_unknown_barcode():
+    sv, _ = make_client(make_response(status=404, body={"error": "No release found for that UPC"}))
+
+    with pytest.raises(SonoVaultError) as err:
+        sv.releases.by_upc("012345678905")
+
+    assert err.value.status == 404
+
+
 def test_release_carries_musicbrainz_id_lists():
     sv, _ = make_client(make_response(body={
         "id": 7, "title": "Discovery",
